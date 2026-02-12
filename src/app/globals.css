@@ -1,26 +1,522 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════
+   EPHRAIM OS - "THE ABYSSAL" DESIGN SYSTEM
+   Luxury Agency Aesthetic | Deep Navy | Editorial Typography
+   ═══════════════════════════════════════════════════════════════ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ─── THE ABYSSAL NAVY (Ultra-Dark Blue-Black) ─── */
+  --background: #02040A;
+  --background-elevated: #060A14;
+  --surface: #0B101B;
+  --surface-hover: #101724;
+  --border: rgba(50, 89, 168, 0.1);
+  --border-subtle: rgba(50, 89, 168, 0.05);
+
+  /* ─── TYPOGRAPHY ─── */
+  --foreground: #E8ECF4;
+  --text-primary: #E8ECF4;
+  --text-secondary: #8A9AB4;
+  --text-muted: #4A5568;
+  --text-disabled: #2D3748;
+
+  /* ─── REFINED COBALT (Royal Blue - NOT Neon) ─── */
+  --accent: #3259A8;
+  --accent-dim: #2A4A8A;
+  --accent-glow: 0 0 60px rgba(50, 89, 168, 0.15);
+  --accent-glow-intense: 0 0 100px rgba(50, 89, 168, 0.25);
+
+  /* ─── WARM GOLD (For Premium Highlights) ─── */
+  --gold: #C9A962;
+  --gold-dim: #A68B4D;
+
+  /* ─── STATUS COLORS (Muted, Sophisticated) ─── */
+  --success: #4ADE80;
+  --success-dim: #22C55E;
+  --warning: #FBBF24;
+  --warning-dim: #D97706;
+  --error: #F87171;
+  --error-dim: #DC2626;
+
+  /* ─── SPACING (8px Grid) ─── */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --space-4xl: 6rem;
+  --space-5xl: 8rem;
+
+  /* ─── TYPOGRAPHY SCALE ─── */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  --text-7xl: 4.5rem;
+  --text-8xl: 6rem;
+  --text-9xl: 8rem;
+
+  /* ─── BORDER RADIUS ─── */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* ─── PHYSICS ENGINE (Premium Easing) ─── */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --transition-fast: 300ms var(--ease-out-expo);
+  --transition-base: 600ms var(--ease-out-expo);
+  --transition-slow: 1000ms var(--ease-out-expo);
+  --transition-glacial: 1200ms var(--ease-out-expo);
+
+  /* ─── Z-INDEX LAYERS ─── */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+  --z-tooltip: 500;
+  --z-cursor: 9998;
+  --z-noise: 9999;
 }
 
+/* ─── TAILWIND THEME INTEGRATION ─── */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-instrument);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ═══════════════════════════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════════════════════════ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto;
+  /* Let Lenis handle smooth scrolling */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── SELECTION STYLING ─── */
+::selection {
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+::-moz-selection {
+  background: var(--accent);
+  color: var(--foreground);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THE "FILM GRAIN" NOISE OVERLAY
+   Premium texture that blends with Abyssal Navy
+   ═══════════════════════════════════════════════════════════════ */
+
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: var(--z-noise);
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TYPOGRAPHY CLASSES (Awwwards Style)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Editorial Headlines (Instrument Serif) */
+.font-editorial {
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+
+/* Technical/Micro Text (Geist Mono) */
+.font-technical {
+  font-family: 'Geist Mono', 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  opacity: 0.6;
+}
+
+/* Body Text */
+.font-body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Massive Display Typography */
+.text-massive {
+  font-size: clamp(4rem, 18vw, 14rem);
+  font-weight: 400;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+}
+
+.text-hero {
+  font-size: clamp(3rem, 12vw, 9rem);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+.text-display {
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GLASS MORPHISM & SURFACES (Abyssal Navy)
+   ═══════════════════════════════════════════════════════════════ */
+
+.glass {
+  background: rgba(11, 16, 27, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+}
+
+.glass-heavy {
+  background: rgba(11, 16, 27, 0.9);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid var(--border);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GLOW EFFECTS (Subtle, Not Neon)
+   ═══════════════════════════════════════════════════════════════ */
+
+.glow-accent {
+  box-shadow: var(--accent-glow);
+}
+
+.glow-accent-intense {
+  box-shadow: var(--accent-glow-intense);
+}
+
+.text-glow {
+  text-shadow: 0 0 80px rgba(50, 89, 168, 0.3);
+}
+
+/* Refined Silver Gradient Text */
+.text-silver {
+  background: linear-gradient(135deg, #8A9AB4 0%, #E8ECF4 50%, #8A9AB4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Warm Gold Gradient (For VIP elements) */
+.text-gold {
+  background: linear-gradient(135deg, #A68B4D 0%, #C9A962 50%, #A68B4D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BUTTON STYLES (Refined, Not Flashy)
+   ═══════════════════════════════════════════════════════════════ */
+
+.btn-primary {
+  background: var(--foreground);
+  color: var(--background);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  transition: all var(--transition-base);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 60px rgba(232, 236, 244, 0.15);
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--foreground);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  transition: all var(--transition-base);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  background: var(--surface);
+  border-color: rgba(50, 89, 168, 0.2);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: var(--foreground);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  transition: all var(--transition-base);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-accent:hover {
+  background: var(--accent-dim);
+  box-shadow: var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CARD STYLES
+   ═══════════════════════════════════════════════════════════════ */
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: var(--space-xl);
+  transition: all var(--transition-slow);
+}
+
+.card:hover {
+  border-color: rgba(50, 89, 168, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 40px 80px rgba(2, 4, 10, 0.5);
+}
+
+.card-interactive {
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FORM ELEMENTS
+   ═══════════════════════════════════════════════════════════════ */
+
+.input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  color: var(--foreground);
+  font-size: var(--text-base);
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(50, 89, 168, 0.1);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STATUS INDICATORS
+   ═══════════════════════════════════════════════════════════════ */
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.online {
+  background: var(--success);
+  box-shadow: 0 0 12px var(--success);
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.status-dot.offline {
+  background: var(--text-muted);
+}
+
+.status-dot.busy {
+  background: var(--warning);
+  box-shadow: 0 0 12px var(--warning);
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(0.95);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLL & OVERFLOW
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(50, 89, 168, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════ */
+
+.container-narrow {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+.container-wide {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DIVIDER LINES
+   ═══════════════════════════════════════════════════════════════ */
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--border) 50%, transparent 100%);
+}
+
+.divider-vertical {
+  width: 1px;
+  background: linear-gradient(180deg, transparent 0%, var(--border) 50%, transparent 100%);
 }

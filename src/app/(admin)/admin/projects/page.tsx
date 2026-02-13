@@ -15,10 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 export default function ProjectsPage() {
-    // Determine which query to use. If `api.projects.getProjects` exists, use it.
-    // Assuming a standard `getProjects` or `list` query.
-    // Based on schema, we have `projects` table.
-    const projects = useQuery(api.projects.getProjects) || [];
+    // Used generic `list` query instead of `getProjects`
+    const projects = useQuery(api.projects.list) || [];
 
     return (
         <div className="space-y-6">
@@ -51,7 +49,7 @@ export default function ProjectsPage() {
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            projects?.map((project) => (
+                            projects?.map((project: any) => (
                                 <TableRow key={project._id} className="border-white/10 hover:bg-white/5">
                                     <TableCell className="font-medium text-white">{project.title}</TableCell>
                                     <TableCell className="text-white/80">

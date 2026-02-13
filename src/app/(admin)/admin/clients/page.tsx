@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 export default function ClientsPage() {
-    const clients = useQuery(api.clients.getClients) || [];
+    const clients = useQuery(api.clients.list) || [];
 
     return (
         <div className="space-y-6">
@@ -48,7 +48,7 @@ export default function ClientsPage() {
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            clients?.map((client) => (
+                            clients?.map((client: any) => (
                                 <TableRow key={client._id} className="border-white/10 hover:bg-white/5">
                                     <TableCell className="font-medium text-white">{client.name}</TableCell>
                                     <TableCell className="text-white/80">{client.company || "-"}</TableCell>

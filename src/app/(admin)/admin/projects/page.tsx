@@ -16,7 +16,7 @@ import { Plus, Edit } from "lucide-react";
 import { ProjectDialog } from "@/components/admin/ProjectDialog";
 
 export default function ProjectsPage() {
-    const projects = useQuery(api.projects.list) || [];
+    const projects = useQuery(api.projects.list, {}) || [];
 
     return (
         <div className="space-y-6">

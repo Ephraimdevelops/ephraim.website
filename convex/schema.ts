@@ -120,6 +120,7 @@ export default defineSchema({
     tagline: v.optional(v.string()),
     description: v.string(),
     coverImage: v.optional(v.id("_storage")),
+    category: v.optional(v.string()), // Added category
     images: v.optional(v.array(v.id("_storage"))),
     metrics: v.optional(v.string()),
     techStack: v.optional(v.array(v.string())),

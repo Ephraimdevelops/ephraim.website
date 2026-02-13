@@ -8,6 +8,7 @@ import { mutation, query } from "./_generated/server";
 export const list = query({
     args: {
         featured: v.optional(v.boolean()),
+        category: v.optional(v.string()), // Added category filter
         status: v.optional(
             v.union(
                 v.literal("discovery"),
@@ -20,21 +21,21 @@ export const list = query({
         ),
     },
     handler: async (ctx, args) => {
+        let projects = await ctx.db.query("projects").order("desc").collect();
+
         if (args.featured !== undefined) {
-            return await ctx.db
-                .query("projects")
-                .withIndex("by_featured", (q) => q.eq("isFeatured", args.featured!))
-                .order("desc")
-                .collect();
+            projects = projects.filter(p => p.isFeatured === args.featured);
         }
+
         if (args.status) {
-            return await ctx.db
-                .query("projects")
-                .withIndex("by_status", (q) => q.eq("status", args.status!))
-                .order("desc")
-                .collect();
+            projects = projects.filter(p => p.status === args.status);
         }
-        return await ctx.db.query("projects").order("desc").collect();
+
+        if (args.category) {
+            projects = projects.filter(p => p.category === args.category);
+        }
+
+        return projects;
     },
 });
 
@@ -85,6 +86,7 @@ export const create = mutation({
         description: v.string(),
         coverImage: v.optional(v.id("_storage")),
         images: v.optional(v.array(v.id("_storage"))),
+        category: v.optional(v.string()), // Added category
         metrics: v.optional(v.string()),
         techStack: v.optional(v.array(v.string())),
         liveUrl: v.optional(v.string()),
@@ -114,6 +116,7 @@ export const create = mutation({
             description: args.description,
             coverImage: args.coverImage,
             images: args.images,
+            category: args.category,
             metrics: args.metrics,
             techStack: args.techStack,
             liveUrl: args.liveUrl,
@@ -139,6 +142,7 @@ export const update = mutation({
         description: v.optional(v.string()),
         coverImage: v.optional(v.id("_storage")),
         images: v.optional(v.array(v.id("_storage"))),
+        category: v.optional(v.string()),
         metrics: v.optional(v.string()),
         techStack: v.optional(v.array(v.string())),
         liveUrl: v.optional(v.string()),

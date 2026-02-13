@@ -50,14 +50,9 @@ export default function InvoicesPage() {
     };
 
     const handleDownload = (invoice: any) => {
-        // For now, since we don't have a real PDF generator, we'll mock this or print.
-        // In a real app, this would fetch a signed URL or trigger a server-side PDF generation.
-        toast.info("Downloading PDF...");
-        // Placeholder for future PDF generation logic
-        // window.open(`/api/invoices/${invoice._id}/pdf`, '_blank');
-        setTimeout(() => {
-            toast.success("Download started (Mock)");
-        }, 1000);
+        // Open the public invoice page which has a print/download button
+        window.open(`/invoice/${invoice._id}`, '_blank');
+        toast.info("Opening invoice print view...");
     };
 
     const formatCurrency = (amount: number, currency: string) => {

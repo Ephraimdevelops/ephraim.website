@@ -23,6 +23,7 @@ const navItems = [
     { name: "Bookings", href: "/admin/bookings", icon: CalendarDays },
     { name: "Clients", href: "/admin/clients", icon: Users },
     { name: "Projects", href: "/admin/projects", icon: Briefcase },
+    { name: "Invoices", href: "/admin/invoices", icon: Receipt },
     { name: "Finance", href: "/admin/finance", icon: Receipt },
     { name: "Content", href: "/admin/content", icon: FileText },
     { name: "Settings", href: "/admin/settings", icon: Settings },

@@ -42,10 +42,10 @@ export default function HomePage() {
       <Navbar />
 
       {/* ═══════════════════════════════════════════════════════════════
-          1. HERO SECTION - "THE ARCHITECT"
-          Layout: Split (Text Left, Portrait Right/Integrated)
-          Copy: "Stop Scroll Marketing"
-          Features: Bottom fade/shadow for seamless image blend
+          1. HERO SECTION - "THE BUSINESS BUILDER"
+          Layout: Split (Text Left, Portrait Right)
+          Copy: Simplified for clarity ("Standard Seven Billionaire")
+          Features: Mobile Optimized (40vh image)
           ═══════════════════════════════════════════════════════════════ */}
       <section
         className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden px-6 pt-32 md:pt-0"
@@ -76,23 +76,23 @@ export default function HomePage() {
                 Result Oriented
               </div>
               <p className="font-technical text-[11px] text-[#8A9AB4] tracking-widest uppercase">
-                Digital Architect
+                Digital Business Builder
               </p>
             </motion.div>
 
-            {/* Headline - Size Decreased as requested */}
+            {/* Headline - Simplified & Powerful */}
             <motion.h1
               className="font-editorial text-5xl md:text-6xl lg:text-7xl text-[#E8ECF4] leading-[1.1] mb-8"
               variants={fadeUp}
             >
               Your guy for
               <br />
-              <span className="italic text-[#3259A8]">Stop-Scroll Marketing</span>
+              <span className="italic text-[#3259A8]">Powerful Websites</span>
               <br />
-              & refined services.
+              & Smart Systems.
             </motion.h1>
 
-            {/* Subheadline - Specific User Copy */}
+            {/* Subheadline - Simple everyday language */}
             <motion.p
               className="mt-6 max-w-lg mx-auto md:mx-0 text-lg text-[#8A9AB4] leading-relaxed"
               variants={fadeUp}
@@ -100,7 +100,7 @@ export default function HomePage() {
               I build modern platforms, apps, websites, branding and set up AI agents to handle your busy work. Look better, work faster, and sell more.
             </motion.p>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - Clear actions */}
             <motion.div
               className="mt-10 flex flex-wrap items-center justify-center md:justify-start gap-4"
               variants={fadeUp}
@@ -109,14 +109,14 @@ export default function HomePage() {
                 Start a Project
               </Link>
               <Link href="/work" className="btn-ghost">
-                View Work
+                View My Work
               </Link>
             </motion.div>
           </motion.div>
 
           {/* RIGHT: Portrait Image with BOTTOM SHADOW CLEAN BLEND */}
           <motion.div
-            className="order-1 md:order-2 relative h-[50vh] md:h-[85vh] w-full flex items-end justify-center md:justify-end"
+            className="order-1 md:order-2 relative h-[40vh] md:h-[85vh] w-full flex items-end justify-center md:justify-end"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
@@ -171,7 +171,7 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* 2. STATS SECTION */}
+      {/* 2. STATS SECTION - Simplified Language */}
       <section className="relative z-10 border-t border-[#3259A8]/10 bg-[#02040A]">
         <div className="container-wide py-20">
           <motion.div
@@ -182,10 +182,10 @@ export default function HomePage() {
             variants={staggerChildren}
           >
             {[
-              { value: "50+", label: "Projects Shipped" },
-              { value: "12", label: "Countries Reached" },
+              { value: "50+", label: "Projects Completed" },
+              { value: "12", label: "Countries Served" },
               { value: "5+", label: "Years Experience" },
-              { value: "100%", label: "Client Retention" },
+              { value: "100%", label: "Happy Clients" },
             ].map((stat) => (
               <motion.div
                 key={stat.label}

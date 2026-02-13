@@ -39,16 +39,18 @@ export const metadata: Metadata = {
     template: "%s | Ephraim",
   },
   description:
-    "Forging digital empires for the boldest brands in Africa and beyond. Technical precision meets cinematic storytelling.",
+    "Forging digital empires for the boldest brands. High-end web design, Next.js development, and Stop-Scroll Marketing strategies.",
   keywords: [
-    "web development",
-    "digital design",
+    "Digital Architect",
+    "Stop-Scroll Marketing",
+    "High-End Web Design",
+    "Next.js Developer",
     "Tanzania",
     "Africa",
-    "portfolio",
-    "creative agency",
-    "Next.js",
+    "Portfolio",
+    "Creative Agency",
     "React",
+    "AI Automation"
   ],
   authors: [{ name: "Ephraim" }],
   creator: "Ephraim",
@@ -60,7 +62,7 @@ export const metadata: Metadata = {
     siteName: "Ephraim | Digital Architect",
     title: "Ephraim | Digital Architect",
     description:
-      "Forging digital empires for the boldest brands in Africa and beyond.",
+      "Forging digital empires for the boldest brands. High-end web design meets Stop-Scroll Marketing.",
     images: [
       {
         url: "/og-image.jpg",
@@ -74,7 +76,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Ephraim | Digital Architect",
     description:
-      "Forging digital empires for the boldest brands in Africa and beyond.",
+      "Forging digital empires for the boldest brands. High-end web design meets Stop-Scroll Marketing.",
     images: ["/og-image.jpg"],
   },
   manifest: "/manifest.json",

@@ -14,15 +14,15 @@ export function ServicesSection() {
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 0.8 }}
                 >
-                    <p className="font-technical mb-6 text-[#3259A8]">CAPABILITIES</p>
+                    <p className="font-technical mb-6 text-[#3259A8]">WHAT I DO</p>
                     <h2 className="font-editorial text-4xl md:text-6xl text-[#E8ECF4] max-w-4xl leading-tight">
                         I don&apos;t just build websites.<br />
-                        I engineer <span className="italic text-[#8A9AB4]">Digital Ecosystems.</span>
+                        I build <span className="italic text-[#8A9AB4]">Digital Businesses.</span>
                     </h2>
                 </motion.div>
 
                 <div className="grid md:grid-cols-2 gap-x-12 gap-y-16">
-                    {/* 1. Digital Infrastructure */}
+                    {/* 1. Websites & Systems (Formerly Digital Infrastructure) */}
                     <motion.div
                         className="group"
                         initial={{ opacity: 0, y: 30 }}
@@ -34,18 +34,18 @@ export function ServicesSection() {
                             <span className="p-3 rounded-full bg-[#3259A8]/10 text-[#3259A8] group-hover:bg-[#3259A8] group-hover:text-white transition-colors">
                                 <Cpu className="w-6 h-6" />
                             </span>
-                            <h3 className="font-editorial text-3xl text-[#E8ECF4]">Digital Infrastructure</h3>
+                            <h3 className="font-editorial text-3xl text-[#E8ECF4]">Websites & Systems</h3>
                             <span className="font-technical text-xs text-[#8A9AB4] border border-[#3259A8]/30 px-2 py-1 rounded-full">The Engine</span>
                         </div>
                         <p className="text-[#8A9AB4] text-lg leading-relaxed mb-6">
-                            I build high-performance digital headquarters that run your business while you sleep. No templates. No fragilities. Just bespoke, silicon-valley grade systems designed for speed and scale.
+                            I build fast, beautiful websites and systems that run your business while you sleep. No broken templates. Just high-quality tools designed to grow with you.
                         </p>
                         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {[
-                                "Cinematic Web Platforms",
-                                "Custom Business Operating Systems",
-                                "Booking Engines & B2B Portals",
-                                "Secure NGO Dashboards"
+                                "Modern Websites",
+                                "Business Management Systems",
+                                "Booking portals",
+                                "Secure Dashboards"
                             ].map((item) => (
                                 <li key={item} className="flex items-center gap-2 text-sm text-[#E8ECF4] font-technical">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#3259A8]" />
@@ -55,7 +55,7 @@ export function ServicesSection() {
                         </ul>
                     </motion.div>
 
-                    {/* 2. Business Intelligence */}
+                    {/* 2. AI & Automation (Formerly Business Intelligence) */}
                     <motion.div
                         className="group"
                         initial={{ opacity: 0, y: 30 }}
@@ -67,18 +67,18 @@ export function ServicesSection() {
                             <span className="p-3 rounded-full bg-[#3259A8]/10 text-[#3259A8] group-hover:bg-[#3259A8] group-hover:text-white transition-colors">
                                 <Brain className="w-6 h-6" />
                             </span>
-                            <h3 className="font-editorial text-3xl text-[#E8ECF4]">Business Intelligence</h3>
+                            <h3 className="font-editorial text-3xl text-[#E8ECF4]">AI & Automation</h3>
                             <span className="font-technical text-xs text-[#8A9AB4] border border-[#3259A8]/30 px-2 py-1 rounded-full">The Brain</span>
                         </div>
                         <p className="text-[#8A9AB4] text-lg leading-relaxed mb-6">
-                            I deploy autonomous AI agents that handle your repetitive tasks, from customer support to data entry. We turn "manual grunt work" into automated profit.
+                            I set up smart AI assistants that handle repetitive tasks for you. From answering customer questions to data entry, we turn boring work into automatic profit.
                         </p>
                         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {[
-                                "Custom AI Chatbots & Concierges",
-                                "Workflow Automation (Zapier/Make)",
-                                "Data Visualization & Reporting",
-                                "Smart Lead Capture Systems"
+                                "Custom AI Chatbots",
+                                "Work Automation",
+                                "Data Reporting",
+                                "Smart Lead Collection"
                             ].map((item) => (
                                 <li key={item} className="flex items-center gap-2 text-sm text-[#E8ECF4] font-technical">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#3259A8]" />
@@ -88,7 +88,7 @@ export function ServicesSection() {
                         </ul>
                     </motion.div>
 
-                    {/* 3. Brand Authority */}
+                    {/* 3. Branding & Design (Formerly Brand Authority) */}
                     <motion.div
                         className="group"
                         initial={{ opacity: 0, y: 30 }}
@@ -100,18 +100,18 @@ export function ServicesSection() {
                             <span className="p-3 rounded-full bg-[#3259A8]/10 text-[#3259A8] group-hover:bg-[#3259A8] group-hover:text-white transition-colors">
                                 <Zap className="w-6 h-6" />
                             </span>
-                            <h3 className="font-editorial text-3xl text-[#E8ECF4]">Brand Authority</h3>
+                            <h3 className="font-editorial text-3xl text-[#E8ECF4]">Branding & Design</h3>
                             <span className="font-technical text-xs text-[#8A9AB4] border border-[#3259A8]/30 px-2 py-1 rounded-full">The Face</span>
                         </div>
                         <p className="text-[#8A9AB4] text-lg leading-relaxed mb-6">
-                            I craft visual identities that make local businesses look like global giants. Whether it’s a national campaign or a corporate rebrand, I ensure you command respect instantly.
+                            I design brands that make local businesses look like global giants. Whether it’s a new logo or a full company makeover, I make sure you look professional and trustworthy.
                         </p>
                         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {[
-                                "Strategic Corporate Identity",
-                                "National Campaign Strategy",
-                                "Motion Design & Cinematic Reels",
-                                "Investor Pitch Decks"
+                                "Logo & Identity",
+                                "Marketing Strategy",
+                                "Video & Animation",
+                                "Pitch Decks"
                             ].map((item) => (
                                 <li key={item} className="flex items-center gap-2 text-sm text-[#E8ECF4] font-technical">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#3259A8]" />
@@ -121,7 +121,7 @@ export function ServicesSection() {
                         </ul>
                     </motion.div>
 
-                    {/* 4. Corporate Capability */}
+                    {/* 4. Training (Formerly Corporate Capability) */}
                     <motion.div
                         className="group"
                         initial={{ opacity: 0, y: 30 }}
@@ -133,18 +133,18 @@ export function ServicesSection() {
                             <span className="p-3 rounded-full bg-[#3259A8]/10 text-[#3259A8] group-hover:bg-[#3259A8] group-hover:text-white transition-colors">
                                 <Users className="w-6 h-6" />
                             </span>
-                            <h3 className="font-editorial text-3xl text-[#E8ECF4]">Corporate Capability</h3>
+                            <h3 className="font-editorial text-3xl text-[#E8ECF4]">Training & Support</h3>
                             <span className="font-technical text-xs text-[#8A9AB4] border border-[#3259A8]/30 px-2 py-1 rounded-full">The People</span>
                         </div>
                         <p className="text-[#8A9AB4] text-lg leading-relaxed mb-6">
-                            Technology is useless if your team cannot use it. I bridge the skills gap by training your staff to master modern digital tools, ensuring your investment actually pays off.
+                            Technology is useless if your team cannot use it. I teach your staff how to use modern digital tools, ensuring your investment actually pays off.
                         </p>
                         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {[
-                                "Staff Digital Training Workshops",
-                                "AI Implementation Seminars",
-                                "Technical Hiring Support",
-                                "Digital Strategy Consultation"
+                                "Staff Training",
+                                "AI Workshops",
+                                "Tech Hiring Help",
+                                "Digital Strategy"
                             ].map((item) => (
                                 <li key={item} className="flex items-center gap-2 text-sm text-[#E8ECF4] font-technical">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#3259A8]" />

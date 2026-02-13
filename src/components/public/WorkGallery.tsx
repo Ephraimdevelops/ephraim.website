@@ -18,6 +18,7 @@ interface Project {
     techStack?: string[];
     liveUrl?: string;
     coverImage?: Id<"_storage">;
+    coverImageUrl?: string | null;
     images?: Id<"_storage">[];
     status: string;
     slug: string;
@@ -96,9 +97,9 @@ export function WorkGallery() {
                             >
                                 {/* Image Aspect Ratio Container */}
                                 <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-white/10 bg-[#060A14] mb-6">
-                                    {project.coverImage ? (
+                                    {project.coverImageUrl ? (
                                         <Image
-                                            src={`${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${project.coverImage}`}
+                                            src={project.coverImageUrl}
                                             alt={project.title}
                                             fill
                                             className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"

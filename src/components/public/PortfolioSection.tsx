@@ -19,6 +19,7 @@ interface Project {
     techStack?: string[];
     liveUrl?: string;
     coverImage?: Id<"_storage">;
+    coverImageUrl?: string | null;
     images?: Id<"_storage">[];
     status: string;
     slug: string;
@@ -168,9 +169,9 @@ function ProjectCard({ project, index, onClick }: { project: Project, index: num
         >
             {/* Image Container */}
             <div className="absolute inset-0 rounded-lg overflow-hidden border border-white/10 bg-[#060A14]">
-                {project.coverImage ? (
+                {project.coverImageUrl ? (
                     <Image
-                        src={`${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${project.coverImage}`}
+                        src={project.coverImageUrl}
                         alt={project.title}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 group-hover:opacity-100"
@@ -210,9 +211,9 @@ function MobileProjectCard({ project, index, onClick }: { project: Project, inde
             onClick={onClick}
             className="relative aspect-[4/5] w-full rounded-xl overflow-hidden border border-white/10 bg-[#060A14]"
         >
-            {project.coverImage ? (
+            {project.coverImageUrl ? (
                 <Image
-                    src={`${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${project.coverImage}`}
+                    src={project.coverImageUrl}
                     alt={project.title}
                     fill
                     className="object-cover opacity-70"

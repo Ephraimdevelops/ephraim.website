@@ -35,45 +35,78 @@ export const list = query({
             projects = projects.filter(p => p.category === args.category);
         }
 
-        return projects;
+        // Resolve generic URLs for cover images
+        return await Promise.all(projects.map(async (p) => ({
+            ...p,
+            coverImageUrl: p.coverImage ? await ctx.storage.getUrl(p.coverImage) : null,
+        })));
     },
 });
 
 export const getFeatured = query({
     args: {},
     handler: async (ctx) => {
-        return await ctx.db
+        const projects = await ctx.db
             .query("projects")
             .withIndex("by_featured", (q) => q.eq("isFeatured", true))
             .order("desc")
             .collect();
+
+        return await Promise.all(projects.map(async (p) => ({
+            ...p,
+            coverImageUrl: p.coverImage ? await ctx.storage.getUrl(p.coverImage) : null,
+        })));
     },
 });
 
 export const getBySlug = query({
     args: { slug: v.string() },
     handler: async (ctx, args) => {
-        return await ctx.db
+        const project = await ctx.db
             .query("projects")
             .withIndex("by_slug", (q) => q.eq("slug", args.slug))
             .first();
+
+        if (!project) return null;
+
+        return {
+            ...project,
+            coverImageUrl: project.coverImage ? await ctx.storage.getUrl(project.coverImage) : null,
+            imagesUrls: project.images
+                ? await Promise.all(project.images.map(id => ctx.storage.getUrl(id)))
+                : []
+        };
     },
 });
 
 export const getById = query({
     args: { id: v.id("projects") },
     handler: async (ctx, args) => {
-        return await ctx.db.get(args.id);
+        const project = await ctx.db.get(args.id);
+        if (!project) return null;
+
+        return {
+            ...project,
+            coverImageUrl: project.coverImage ? await ctx.storage.getUrl(project.coverImage) : null,
+            imagesUrls: project.images
+                ? await Promise.all(project.images.map(id => ctx.storage.getUrl(id)))
+                : []
+        };
     },
 });
 
 export const getByClient = query({
     args: { clientId: v.id("clients") },
     handler: async (ctx, args) => {
-        return await ctx.db
+        const projects = await ctx.db
             .query("projects")
             .withIndex("by_client", (q) => q.eq("clientId", args.clientId))
             .collect();
+
+        return await Promise.all(projects.map(async (p) => ({
+            ...p,
+            coverImageUrl: p.coverImage ? await ctx.storage.getUrl(p.coverImage) : null,
+        })));
     },
 });
 

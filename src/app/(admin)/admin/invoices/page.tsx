@@ -10,21 +10,54 @@ import {
     CheckCircle2,
     Clock,
     XCircle,
-    Download
+    Download,
+    Loader2,
+    RefreshCcw,
+    Send
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner"; // Assuming sonner is used, if not we'll use a basic alert or standard toast
+import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function InvoicesPage() {
     const invoices = useQuery(api.invoices.list, {});
+    const updateStatus = useMutation(api.invoices.updateStatus);
     const markAsPaid = useMutation(api.invoices.markAsPaid);
 
-    const [loadingId, setLoadingId] = useState<string | null>(null);
+    const [processingId, setProcessingId] = useState<string | null>(null);
 
-    const handleMarkPaid = async (id: any) => {
-        setLoadingId(id);
-        await markAsPaid({ id });
-        setLoadingId(null);
+    const handleStatusChange = async (id: Id<"invoices">, status: string) => {
+        setProcessingId(id);
+        try {
+            await updateStatus({ id, status: status as any });
+            toast.success(`Invoice status updated to ${status}`);
+        } catch (error) {
+            toast.error("Failed to update status");
+            console.error(error);
+        } finally {
+            setProcessingId(null);
+        }
+    };
+
+    const handleDownload = (invoice: any) => {
+        // For now, since we don't have a real PDF generator, we'll mock this or print.
+        // In a real app, this would fetch a signed URL or trigger a server-side PDF generation.
+        toast.info("Downloading PDF...");
+        // Placeholder for future PDF generation logic
+        // window.open(`/api/invoices/${invoice._id}/pdf`, '_blank');
+        setTimeout(() => {
+            toast.success("Download started (Mock)");
+        }, 1000);
     };
 
     const formatCurrency = (amount: number, currency: string) => {
@@ -40,6 +73,7 @@ export default function InvoicesPage() {
             case "overdue": return "text-red-500 bg-red-500/10 border-red-500/20";
             case "sent": return "text-blue-500 bg-blue-500/10 border-blue-500/20";
             case "draft": return "text-white/40 bg-white/5 border-white/10";
+            case "cancelled": return "text-gray-500 bg-gray-500/10 border-gray-500/20";
             default: return "text-white/40";
         }
     };
@@ -100,14 +134,10 @@ export default function InvoicesPage() {
                                         {inv.invoiceNumber}
                                     </td>
                                     <td className="px-6 py-4 text-white">
-                                        {/* Accessing client name requires a separate query or join. 
-                        For now, showing ID or we need to fetch clients. 
-                        Let's just show 'Client' placeholder if we can't join easily 
-                        without a more complex query. 
-                        Actually, Convex doesn't do joins. We usually fetch clients separately.
-                        I'll just show 'Client' for now or the ID in tooltip.
-                    */}
-                                        <span title={inv.clientId}>Client {inv.clientId.slice(0, 4)}...</span>
+                                        <span title={inv.clientId} className="text-white/80">
+                                            {/* Ideally fetch client name here */}
+                                            Client {inv.clientId.slice(0, 4)}...
+                                        </span>
                                     </td>
                                     <td className="px-6 py-4 text-white/60">
                                         {format(new Date(inv.createdAt), "MMM d, yyyy")}
@@ -120,20 +150,53 @@ export default function InvoicesPage() {
                                             {inv.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
-                                        {inv.status !== 'paid' && (
-                                            <button
-                                                onClick={() => handleMarkPaid(inv._id)}
-                                                disabled={loadingId === inv._id}
-                                                className="p-1.5 hover:bg-emerald-500/10 text-emerald-500/60 hover:text-emerald-500 rounded transition-colors"
-                                                title="Mark as Paid"
-                                            >
-                                                <CheckCircle2 className="w-4 h-4" />
-                                            </button>
-                                        )}
-                                        <button className="p-1.5 hover:bg-white/10 text-white/40 hover:text-white/80 rounded transition-colors" title="Download PDF">
-                                            <Download className="w-4 h-4" />
-                                        </button>
+                                    <td className="px-6 py-4 text-right">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-white/10 text-white/60">
+                                                    <span className="sr-only">Open menu</span>
+                                                    {processingId === inv._id ? (
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                    ) : (
+                                                        <MoreHorizontal className="w-4 h-4" />
+                                                    )}
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="bg-[#0A0C14] border-white/10 text-white">
+                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                <DropdownMenuItem
+                                                    onClick={() => handleDownload(inv)}
+                                                    className="hover:bg-white/5 cursor-pointer"
+                                                >
+                                                    <Download className="mr-2 h-4 w-4" />
+                                                    Download PDF
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator className="bg-white/10" />
+                                                <DropdownMenuLabel>Update Status</DropdownMenuLabel>
+                                                <DropdownMenuItem onClick={() => handleStatusChange(inv._id, 'paid')} className="hover:bg-white/5 cursor-pointer">
+                                                    <CheckCircle2 className="mr-2 h-4 w-4 text-emerald-500" />
+                                                    Mark as Paid
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleStatusChange(inv._id, 'sent')} className="hover:bg-white/5 cursor-pointer">
+                                                    <Send className="mr-2 h-4 w-4 text-blue-500" />
+                                                    Mark as Sent
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleStatusChange(inv._id, 'overdue')} className="hover:bg-white/5 cursor-pointer">
+                                                    <Clock className="mr-2 h-4 w-4 text-red-500" />
+                                                    Mark as Overdue
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleStatusChange(inv._id, 'cancelled')} className="hover:bg-white/5 cursor-pointer">
+                                                    <XCircle className="mr-2 h-4 w-4 text-gray-500" />
+                                                    Mark as Cancelled
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator className="bg-white/10" />
+                                                <DropdownMenuItem asChild className="hover:bg-white/5 cursor-pointer">
+                                                    <Link href={`/admin/invoices/${inv._id}/edit`}>
+                                                        Edit Invoice
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </td>
                                 </tr>
                             ))

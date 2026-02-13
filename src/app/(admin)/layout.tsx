@@ -38,7 +38,7 @@ export default async function AdminLayout({
     return (
         <div className="flex h-screen bg-[#050505] text-[#EDEDED]">
             <AdminSidebar />
-            <main className="flex-1 ml-64 overflow-y-auto p-8 relative">
+            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto p-4 pt-20 md:p-8 relative">
                 {/* Noise overlay for consistency */}
                 <div className="fixed inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay z-[60]"
                     style={{ backgroundImage: 'url("/noise.png")' }} />

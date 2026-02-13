@@ -5,6 +5,7 @@ import "./globals.css";
 import { ConvexClientProvider } from "@/components/providers/ConvexClientProvider";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { GhostCursor } from "@/components/ui/GhostCursor";
+import { Toaster } from "@/components/ui/sonner";
 
 // ═══════════════════════════════════════════════════════════════
 // FONT CONFIGURATION - The Typographic Hierarchy
@@ -127,6 +128,7 @@ export default function RootLayout({
 
             {/* Main Content */}
             <main>{children}</main>
+            <Toaster />
           </LenisProvider>
         </ConvexClientProvider>
       </body>

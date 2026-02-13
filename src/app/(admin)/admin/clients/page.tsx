@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 export default function ClientsPage() {
-    const clients = useQuery(api.clients.list) || [];
+    const clients = useQuery(api.clients.list, {}) || [];
 
     return (
         <div className="space-y-6">

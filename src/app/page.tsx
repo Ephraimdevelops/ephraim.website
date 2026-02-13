@@ -48,7 +48,7 @@ export default function HomePage() {
           Features: Mobile Optimized (40vh image)
           ═══════════════════════════════════════════════════════════════ */}
       <section
-        className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden px-6 pt-32 md:pt-0"
+        className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden px-6 pt-24 md:pt-0"
       >
         {/* Gradient Background */}
         <div className="absolute inset-0 z-0">
@@ -64,7 +64,7 @@ export default function HomePage() {
 
           {/* LEFT: Text Content */}
           <motion.div
-            className="order-2 md:order-1 text-center md:text-left"
+            className="order-2 md:order-1 text-center md:text-left relative z-20"
             style={{ y: heroY, opacity: heroOpacity }}
             variants={staggerChildren}
             initial="initial"
@@ -82,7 +82,7 @@ export default function HomePage() {
 
             {/* Headline - Simplified & Powerful */}
             <motion.h1
-              className="font-editorial text-5xl md:text-6xl lg:text-7xl text-[#E8ECF4] leading-[1.1] mb-8"
+              className="font-editorial text-4xl md:text-6xl lg:text-7xl text-[#E8ECF4] leading-[1.1] mb-8"
               variants={fadeUp}
             >
               Your guy for
@@ -116,7 +116,7 @@ export default function HomePage() {
 
           {/* RIGHT: Portrait Image with BOTTOM SHADOW CLEAN BLEND */}
           <motion.div
-            className="order-1 md:order-2 relative h-[40vh] md:h-[85vh] w-full flex items-end justify-center md:justify-end"
+            className="order-1 md:order-2 relative h-[35vh] md:h-[85vh] w-full flex items-end justify-center md:justify-end z-10"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
@@ -173,7 +173,7 @@ export default function HomePage() {
 
       {/* 2. STATS SECTION - Simplified Language */}
       <section className="relative z-10 border-t border-[#3259A8]/10 bg-[#02040A]">
-        <div className="container-wide py-20">
+        <div className="container-wide py-12">
           <motion.div
             className="grid grid-cols-2 gap-12 md:grid-cols-4"
             initial="initial"
@@ -192,7 +192,7 @@ export default function HomePage() {
                 className="text-center"
                 variants={fadeUp}
               >
-                <p className="font-editorial text-5xl md:text-6xl text-[#E8ECF4]">
+                <p className="font-editorial text-4xl md:text-6xl text-[#E8ECF4]">
                   {stat.value}
                 </p>
                 <p className="font-technical mt-4">
@@ -209,14 +209,14 @@ export default function HomePage() {
         <AboutSection />
       </div>
 
+      {/* 5. PORTFOLIO SECTION (Moved Up) */}
+      <div id="work">
+        <PortfolioSection />
+      </div>
+
       {/* 4. SERVICES SECTION */}
       <div id="services">
         <ServicesSection />
-      </div>
-
-      {/* 5. PORTFOLIO SECTION */}
-      <div id="work">
-        <PortfolioSection />
       </div>
 
       {/* 6. PROCESS SECTION */}
@@ -228,28 +228,96 @@ export default function HomePage() {
       </div>
 
       {/* 8. CONTACT SECTION */}
-      <section className="relative z-10 bg-[#02040A] pt-40 pb-20 border-t border-[#3259A8]/10" id="contact">
-        <div className="container-wide text-center mb-12">
-          <h2 className="font-editorial text-5xl md:text-7xl text-white mb-6">
-            Ready to <span className="italic text-[#3259A8]">Start?</span>
-          </h2>
-          <p className="text-[#8A9AB4] mb-8 font-technical text-lg">
-            Tell me about your vision or book a call directly.
-          </p>
+      <section className="relative z-10 bg-[#02040A] pt-12 pb-12 border-t border-[#3259A8]/10" id="contact">
+        <div className="container-wide">
+          <div className="text-center mb-12 md:mb-20">
+            <h2 className="font-editorial text-4xl md:text-7xl text-white mb-6">
+              Ready to <span className="italic text-[#3259A8]">Start?</span>
+            </h2>
+            <p className="text-[#8A9AB4] font-technical text-base md:text-lg max-w-xl mx-auto">
+              Tell me about your vision or reach out directly.
+            </p>
+          </div>
 
-          <Link
-            href="/book"
-            className="inline-flex items-center gap-3 px-8 py-4 border border-[#3259A8] rounded-full text-[#3259A8] font-technical hover:bg-[#3259A8] hover:text-white transition-all duration-300 group"
-          >
-            Skip the form, Book a Call
-            <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
-          </Link>
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+            {/* LEFT: FORM */}
+            <div className="w-full">
+              <ConversationalForm />
+            </div>
+
+            {/* RIGHT: DIRECT CONTACT */}
+            <div className="space-y-12 lg:pt-12">
+              <div>
+                <h3 className="font-editorial text-3xl text-[#E8ECF4] mb-6">
+                  Ways to <span className="italic text-[#3259A8]">Connect</span>
+                </h3>
+                <p className="text-[#8A9AB4] font-technical text-lg mb-8 leading-relaxed">
+                  Skip the form and get in touch directly. I'm available for quick chats on WhatsApp, a phone call, or email.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <a
+                  href="mailto:ephraba@live.com"
+                  className="flex items-center gap-6 p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-[#3259A8]/50 transition-all duration-300 group"
+                >
+                  <div className="h-12 w-12 rounded-full bg-[#3259A8]/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    ✉️
+                  </div>
+                  <div>
+                    <p className="font-technical text-[10px] text-[#8A9AB4] uppercase tracking-wider mb-1">Email Me</p>
+                    <p className="font-editorial text-xl text-[#E8ECF4]">ephraba@live.com</p>
+                  </div>
+                </a>
+
+                <a
+                  href="https://wa.me/255769517032"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-6 p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-[#25D366]/50 transition-all duration-300 group"
+                >
+                  <div className="h-12 w-12 rounded-full bg-[#25D366]/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    💬
+                  </div>
+                  <div>
+                    <p className="font-technical text-[10px] text-[#8A9AB4] uppercase tracking-wider mb-1">WhatsApp</p>
+                    <p className="font-editorial text-xl text-[#E8ECF4]">+255 769 517 032</p>
+                  </div>
+                </a>
+
+                <a
+                  href="tel:+255769517032"
+                  className="flex items-center gap-6 p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-[#3259A8]/50 transition-all duration-300 group"
+                >
+                  <div className="h-12 w-12 rounded-full bg-[#3259A8]/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    📞
+                  </div>
+                  <div>
+                    <p className="font-technical text-[10px] text-[#8A9AB4] uppercase tracking-wider mb-1">Call Me</p>
+                    <p className="font-editorial text-xl text-[#E8ECF4]">+255 769 517 032</p>
+                  </div>
+                </a>
+              </div>
+
+              <div className="pt-8 border-t border-white/10">
+                <p className="font-technical text-sm text-[#8A9AB4] mb-4">
+                  Prefer a scheduled meeting?
+                </p>
+                <Link
+                  href="/book"
+                  className="inline-flex items-center gap-3 px-8 py-4 bg-[#E8ECF4] text-[#02040A] rounded-full font-technical font-medium hover:bg-white transition-all duration-300 group"
+                >
+                  Book a Discovery Call
+                  <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
-        <ConversationalForm />
       </section>
 
       {/* FOOTER */}
-      <footer className="relative z-10 border-t border-[#3259A8]/10 bg-[#02040A] py-16">
+      <footer className="relative z-10 border-t border-[#3259A8]/10 bg-[#02040A] py-12">
         <div className="container-wide">
           <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
             <div>

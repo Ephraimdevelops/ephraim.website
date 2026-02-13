@@ -48,11 +48,11 @@ const steps = [
         type: "select",
         field: "budget" as const,
         options: [
-            { value: "under5k", label: "Under $5K", icon: "💰" },
-            { value: "5k-10k", label: "$5K - $10K", icon: "💰💰" },
-            { value: "10k-25k", label: "$10K - $25K", icon: "💰💰💰" },
-            { value: "25k-50k", label: "$25K - $50K", icon: "💎" },
-            { value: "50k+", label: "$50K+", icon: "🏆" },
+            { value: "under2k", label: "Under $2K", icon: "💰" },
+            { value: "2k-5k", label: "$2K - $5K", icon: "💰💰" },
+            { value: "5k-10k", label: "$5K - $10K", icon: "💰💰💰" },
+            { value: "10k-25k", label: "$10K - $25K", icon: "💎" },
+            { value: "25k+", label: "$25K+", icon: "🏆" },
             { value: "unsure", label: "Not sure yet", icon: "🤔" },
         ],
     },
@@ -190,7 +190,7 @@ export function ConversationalForm() {
     // Success state
     if (isComplete) {
         return (
-            <section className="min-h-screen flex items-center justify-center bg-[#02040A] px-6">
+            <div className="flex items-center justify-center bg-[#02040A] rounded-2xl border border-white/10 p-12 h-full min-h-[400px]">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -198,28 +198,27 @@ export function ConversationalForm() {
                     className="text-center"
                 >
                     <motion.div
-                        className="text-6xl mb-8"
+                        className="text-6xl mb-8 text-[#00D4FF]"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                     >
                         ✓
                     </motion.div>
-                    <h2 className="font-editorial text-4xl md:text-5xl mb-4">
+                    <h2 className="font-editorial text-3xl md:text-4xl mb-4 text-white">
                         Message <span className="italic">received</span>
                     </h2>
                     <p className="text-[#8A9AB4] text-lg max-w-md mx-auto">
-                        I&apos;ll be in touch within 24 hours. In the meantime, feel free to
-                        explore my work.
+                        I&apos;ll be in touch within 24 hours.
                     </p>
                 </motion.div>
-            </section>
+            </div>
         );
     }
 
     return (
-        <section className="min-h-screen flex flex-col justify-center bg-[#02040A] px-6 py-20">
-            <div className="container-narrow">
+        <div className="bg-[#02040A] border border-white/10 rounded-2xl p-6 md:p-12 h-full flex flex-col justify-center min-h-[500px]">
+            <div className="w-full">
                 {/* Progress */}
                 <div className="mb-12">
                     <div className="flex justify-between items-center mb-4">
@@ -255,7 +254,7 @@ export function ConversationalForm() {
                         exit="exit"
                         transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
                     >
-                        <h2 className="font-editorial text-4xl md:text-6xl mb-8 text-[#E8ECF4]">
+                        <h2 className="font-editorial text-3xl md:text-5xl mb-8 text-[#E8ECF4]">
                             {step.question}
                         </h2>
 
@@ -268,7 +267,7 @@ export function ConversationalForm() {
                                 onKeyDown={handleKeyDown}
                                 placeholder={step.placeholder}
                                 autoFocus
-                                className="w-full bg-transparent border-b-2 border-[#3259A8]/30 focus:border-[#3259A8] text-2xl md:text-3xl py-4 text-[#E8ECF4] placeholder:text-[#4A5568] outline-none transition-colors"
+                                className="w-full bg-transparent border-b-2 border-[#3259A8]/30 focus:border-[#3259A8] text-xl md:text-2xl py-4 text-[#E8ECF4] placeholder:text-[#4A5568] outline-none transition-colors"
                             />
                         )}
 
@@ -280,26 +279,26 @@ export function ConversationalForm() {
                                 placeholder={step.placeholder}
                                 autoFocus
                                 rows={4}
-                                className="w-full bg-transparent border-b-2 border-[#3259A8]/30 focus:border-[#3259A8] text-xl md:text-2xl py-4 text-[#E8ECF4] placeholder:text-[#4A5568] outline-none transition-colors resize-none"
+                                className="w-full bg-transparent border-b-2 border-[#3259A8]/30 focus:border-[#3259A8] text-lg md:text-xl py-4 text-[#E8ECF4] placeholder:text-[#4A5568] outline-none transition-colors resize-none"
                             />
                         )}
 
                         {/* Select Options */}
                         {step.type === "select" && step.options && (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
+                            <div className="grid grid-cols-2 gap-3 md:gap-4 mt-8">
                                 {step.options.map((option) => (
                                     <motion.button
                                         key={option.value}
                                         onClick={() => handleSelectOption(option.value)}
-                                        className={`p-6 rounded-xl border text-left transition-all ${formData[step.field] === option.value
-                                                ? "border-[#3259A8] bg-[#3259A8]/10"
-                                                : "border-[#3259A8]/20 hover:border-[#3259A8]/50"
+                                        className={`p-4 md:p-6 rounded-xl border text-left transition-all ${formData[step.field] === option.value
+                                            ? "border-[#3259A8] bg-[#3259A8]/10"
+                                            : "border-[#3259A8]/20 hover:border-[#3259A8]/50"
                                             }`}
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                     >
-                                        <span className="text-2xl mb-2 block">{option.icon}</span>
-                                        <span className="text-[#E8ECF4] font-medium">{option.label}</span>
+                                        <span className="text-xl md:text-2xl mb-2 block">{option.icon}</span>
+                                        <span className="text-[#E8ECF4] font-medium text-sm md:text-base">{option.label}</span>
                                     </motion.button>
                                 ))}
                             </div>
@@ -321,8 +320,8 @@ export function ConversationalForm() {
                 </AnimatePresence>
 
                 {/* Navigation */}
-                <div className="mt-12 flex justify-between items-center">
-                    <p className="font-technical text-[#4A5568] text-xs">
+                <div className="mt-8 md:mt-12 flex justify-between items-center">
+                    <p className="font-technical text-[#4A5568] text-[10px] md:text-xs">
                         {step.optional ? "Optional – press Enter to skip" : "Press Enter ↵"}
                     </p>
 
@@ -330,7 +329,7 @@ export function ConversationalForm() {
                         <motion.button
                             onClick={isLastStep ? handleSubmit : handleNext}
                             disabled={isSubmitting}
-                            className="btn-primary"
+                            className="bg-[#3259A8] text-white px-6 py-3 rounded-full font-technical font-medium hover:bg-[#3259A8]/90 transition-all text-sm md:text-base"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.98 }}
                         >
@@ -353,6 +352,6 @@ export function ConversationalForm() {
                     )}
                 </div>
             </div>
-        </section>
+        </div>
     );
 }

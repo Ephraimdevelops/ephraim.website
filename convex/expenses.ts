@@ -1,28 +1,49 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { api } from "./_generated/api";
 
 // ═══════════════════════════════════════════════════════════════
-// EXPENSES - Bookkeeping & Outgoings
+// EXPENSES — Bookkeeping & Outgoings
+// All amounts in integer cents. Auto-creates transaction on insert.
 // ═══════════════════════════════════════════════════════════════
+
+const expenseCategoryValidator = v.union(
+    v.literal("software"),
+    v.literal("ads"),
+    v.literal("contractors"),
+    v.literal("office"),
+    v.literal("travel"),
+    v.literal("equipment"),
+    v.literal("salary"),
+    v.literal("utilities"),
+    v.literal("insurance"),
+    v.literal("marketing"),
+    v.literal("legal"),
+    v.literal("taxes"),
+    v.literal("other")
+);
+
+const paymentMethodValidator = v.optional(v.union(
+    v.literal("bank_transfer"),
+    v.literal("mobile_money"),
+    v.literal("cash"),
+    v.literal("mpesa"),
+    v.literal("tigo_pesa"),
+    v.literal("card"),
+    v.literal("other")
+));
 
 export const list = query({
     args: {
-        category: v.optional(
-            v.union(
-                v.literal("software"),
-                v.literal("ads"),
-                v.literal("contractors"),
-                v.literal("office"),
-                v.literal("travel"),
-                v.literal("equipment"),
-                v.literal("other")
-            )
-        ),
+        category: v.optional(expenseCategoryValidator),
         startDate: v.optional(v.number()),
         endDate: v.optional(v.number()),
     },
     handler: async (ctx, args) => {
         let expenses = await ctx.db.query("expenses").order("desc").collect();
+
+        // Filter out soft-deleted
+        expenses = expenses.filter((e) => !e.deletedAt);
 
         if (args.category) {
             expenses = expenses.filter((exp) => exp.category === args.category);
@@ -50,38 +71,66 @@ export const getById = query({
 export const create = mutation({
     args: {
         description: v.string(),
-        category: v.union(
-            v.literal("software"),
-            v.literal("ads"),
-            v.literal("contractors"),
-            v.literal("office"),
-            v.literal("travel"),
-            v.literal("equipment"),
-            v.literal("other")
-        ),
-        amount: v.number(),
+        category: expenseCategoryValidator,
+        amountCents: v.number(),
         currency: v.string(),
         vendor: v.optional(v.string()),
         receiptStorageId: v.optional(v.id("_storage")),
         isTaxDeductible: v.boolean(),
+        paymentMethod: paymentMethodValidator,
+        isRecurring: v.optional(v.boolean()),
+        recurringFrequency: v.optional(v.union(
+            v.literal("weekly"),
+            v.literal("biweekly"),
+            v.literal("monthly"),
+            v.literal("quarterly"),
+            v.literal("yearly")
+        )),
         date: v.number(),
         clientId: v.optional(v.id("clients")),
         projectId: v.optional(v.id("projects")),
     },
     handler: async (ctx, args) => {
-        return await ctx.db.insert("expenses", {
+        // 1. Create the transaction (single source of truth)
+        const transactionId = await ctx.db.insert("transactions", {
+            type: "expense",
+            amountCents: -Math.abs(args.amountCents), // Expenses are negative (outflow)
+            currency: args.currency,
             description: args.description,
             category: args.category,
-            amount: args.amount,
+            date: args.date,
+            paymentGateway: args.paymentMethod === "mpesa" ? "mpesa"
+                : args.paymentMethod === "bank_transfer" ? "bank"
+                    : args.paymentMethod === "cash" ? "cash"
+                        : "manual",
+            createdFrom: "expense",
+            isReversal: false,
+            createdAt: Date.now(),
+        });
+
+        // 2. Create the expense record (business UI table)
+        const expenseId = await ctx.db.insert("expenses", {
+            description: args.description,
+            category: args.category,
+            amountCents: args.amountCents,
             currency: args.currency,
             vendor: args.vendor,
             receiptStorageId: args.receiptStorageId,
             isTaxDeductible: args.isTaxDeductible,
+            paymentMethod: args.paymentMethod,
+            isRecurring: args.isRecurring,
+            recurringFrequency: args.recurringFrequency,
             date: args.date,
             clientId: args.clientId,
             projectId: args.projectId,
+            transactionId,
             createdAt: Date.now(),
         });
+
+        // Link transaction back to expense
+        await ctx.db.patch(expenseId, {}); // No-op, transactionId already set
+
+        return expenseId;
     },
 });
 
@@ -89,34 +138,85 @@ export const update = mutation({
     args: {
         id: v.id("expenses"),
         description: v.optional(v.string()),
-        category: v.optional(
-            v.union(
-                v.literal("software"),
-                v.literal("ads"),
-                v.literal("contractors"),
-                v.literal("office"),
-                v.literal("travel"),
-                v.literal("equipment"),
-                v.literal("other")
-            )
-        ),
-        amount: v.optional(v.number()),
+        category: v.optional(expenseCategoryValidator),
+        amountCents: v.optional(v.number()),
         currency: v.optional(v.string()),
         vendor: v.optional(v.string()),
         receiptStorageId: v.optional(v.id("_storage")),
         isTaxDeductible: v.optional(v.boolean()),
+        paymentMethod: paymentMethodValidator,
         date: v.optional(v.number()),
     },
     handler: async (ctx, args) => {
         const { id, ...updates } = args;
-        await ctx.db.patch(id, updates);
+        const existing = await ctx.db.get(id);
+        if (!existing) throw new Error("Expense not found");
+
+        // If amount changed, create a reversal + new transaction
+        if (args.amountCents !== undefined && args.amountCents !== existing.amountCents) {
+            // Reverse old transaction
+            if (existing.transactionId) {
+                await ctx.db.insert("transactions", {
+                    type: "expense",
+                    amountCents: Math.abs(existing.amountCents), // Positive to reverse
+                    currency: existing.currency,
+                    description: `[REVERSAL] ${existing.description}`,
+                    category: existing.category,
+                    date: existing.date,
+                    createdFrom: "expense",
+                    createdFromId: id,
+                    isReversal: true,
+                    reversesTransactionId: existing.transactionId,
+                    createdAt: Date.now(),
+                });
+            }
+
+            // Create new transaction
+            const newTxnId = await ctx.db.insert("transactions", {
+                type: "expense",
+                amountCents: -Math.abs(args.amountCents),
+                currency: args.currency ?? existing.currency,
+                description: args.description ?? existing.description,
+                category: args.category ?? existing.category,
+                date: args.date ?? existing.date,
+                createdFrom: "expense",
+                createdFromId: id,
+                isReversal: false,
+                createdAt: Date.now(),
+            });
+
+            await ctx.db.patch(id, { ...updates, transactionId: newTxnId });
+        } else {
+            await ctx.db.patch(id, updates);
+        }
     },
 });
 
 export const remove = mutation({
     args: { id: v.id("expenses") },
     handler: async (ctx, args) => {
-        await ctx.db.delete(args.id);
+        const expense = await ctx.db.get(args.id);
+        if (!expense) throw new Error("Expense not found");
+
+        // Create reversal transaction
+        if (expense.transactionId) {
+            await ctx.db.insert("transactions", {
+                type: "expense",
+                amountCents: Math.abs(expense.amountCents), // Positive to reverse
+                currency: expense.currency,
+                description: `[VOID] ${expense.description}`,
+                category: expense.category,
+                date: expense.date,
+                createdFrom: "expense",
+                createdFromId: args.id,
+                isReversal: true,
+                reversesTransactionId: expense.transactionId,
+                createdAt: Date.now(),
+            });
+        }
+
+        // Soft delete the expense
+        await ctx.db.patch(args.id, { deletedAt: Date.now() });
     },
 });
 
@@ -132,6 +232,9 @@ export const getStats = query({
     handler: async (ctx, args) => {
         let expenses = await ctx.db.query("expenses").collect();
 
+        // Filter out soft-deleted
+        expenses = expenses.filter((e) => !e.deletedAt);
+
         const now = Date.now();
         const startOfMonth = new Date();
         startOfMonth.setDate(1);
@@ -145,21 +248,21 @@ export const getStats = query({
         );
 
         const stats = {
-            total: expenses.reduce((sum, exp) => sum + exp.amount, 0),
+            totalCents: expenses.reduce((sum, exp) => sum + exp.amountCents, 0),
             count: expenses.length,
             byCategory: {} as Record<string, number>,
-            taxDeductible: 0,
-            nonDeductible: 0,
+            taxDeductibleCents: 0,
+            nonDeductibleCents: 0,
         };
 
         expenses.forEach((exp) => {
             stats.byCategory[exp.category] =
-                (stats.byCategory[exp.category] || 0) + exp.amount;
+                (stats.byCategory[exp.category] || 0) + exp.amountCents;
 
             if (exp.isTaxDeductible) {
-                stats.taxDeductible += exp.amount;
+                stats.taxDeductibleCents += exp.amountCents;
             } else {
-                stats.nonDeductible += exp.amount;
+                stats.nonDeductibleCents += exp.amountCents;
             }
         });
 
@@ -182,13 +285,12 @@ export const getAdSpendROI = query({
         const leads = await ctx.db.query("leads").collect();
         const invoices = await ctx.db.query("invoices").collect();
 
-        // Group by month for the last 6 months
         const now = new Date();
         const roi: Array<{
             month: string;
-            adSpend: number;
+            adSpendCents: number;
             leadsGenerated: number;
-            revenueGenerated: number;
+            revenueCents: number;
             roi: number;
         }> = [];
 
@@ -198,15 +300,18 @@ export const getAdSpendROI = query({
 
             const monthAdSpend = adExpenses
                 .filter(
-                    (exp) => exp.date >= monthStart.getTime() && exp.date <= monthEnd.getTime()
+                    (exp) =>
+                        !exp.deletedAt &&
+                        exp.date >= monthStart.getTime() &&
+                        exp.date <= monthEnd.getTime()
                 )
-                .reduce((sum, exp) => sum + exp.amount, 0);
+                .reduce((sum, exp) => sum + exp.amountCents, 0);
 
             const monthLeads = leads.filter(
                 (lead) =>
                     lead.createdAt >= monthStart.getTime() &&
                     lead.createdAt <= monthEnd.getTime() &&
-                    lead.source // Only count attributed leads
+                    lead.source
             ).length;
 
             const monthRevenue = invoices
@@ -216,13 +321,13 @@ export const getAdSpendROI = query({
                         inv.paidAt >= monthStart.getTime() &&
                         inv.paidAt <= monthEnd.getTime()
                 )
-                .reduce((sum, inv) => sum + inv.total, 0);
+                .reduce((sum, inv) => sum + inv.total * 100, 0); // Convert existing dollars to cents
 
             roi.push({
                 month: monthStart.toLocaleDateString("en-US", { month: "short" }),
-                adSpend: monthAdSpend,
+                adSpendCents: monthAdSpend,
                 leadsGenerated: monthLeads,
-                revenueGenerated: monthRevenue,
+                revenueCents: monthRevenue,
                 roi: monthAdSpend > 0 ? Math.round((monthRevenue / monthAdSpend) * 100) : 0,
             });
         }

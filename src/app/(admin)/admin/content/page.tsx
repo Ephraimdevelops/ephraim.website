@@ -2,145 +2,183 @@
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
-import { format } from "date-fns";
+import { useState } from "react";
 import {
-    Plus,
     FileText,
-    MoreHorizontal,
-    Eye,
-    Edit3,
-    Globe
+    Image as ImageIcon,
+    Video,
+    MessageSquare,
+    Mic,
+    Presentation,
+    Mail,
+    Building2,
+    Sparkles,
+    ChevronRight,
+    Search,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-export default function ContentPage() {
-    const posts = useQuery(api.posts.list, {});
-    const createPost = useMutation(api.posts.create);
+const CONTENT_TYPES = [
+    { id: "blog_post", label: "Blog Post", desc: "Long-form editorial articles", icon: FileText, color: "#3259A8" },
+    { id: "social_post", label: "Social Post", desc: "Captions & threads for social media", icon: MessageSquare, color: "#10b981" },
+    { id: "image", label: "Image Asset", desc: "AI generated or uploaded graphics", icon: ImageIcon, color: "#8b5cf6" },
+    { id: "video", label: "Video Asset", desc: "Short-form or long-form video", icon: Video, color: "#ef4444" },
+    { id: "pitch_deck", label: "Pitch Deck", desc: "Presentation slides & narratives", icon: Presentation, color: "#C9A84C" },
+    { id: "company_brief", label: "Company Brief", desc: "Brand guidelines & internal docs", icon: Building2, color: "#64748b" },
+    { id: "email_campaign", label: "Email Campaign", desc: "Newsletters & announcements", icon: Mail, color: "#f59e0b" },
+] as const;
+
+const BRAND_VOICES = [
+    { id: "corporate_authority", label: "Corporate Authority", desc: "Formal, precise, commanding" },
+    { id: "luxury_lifestyle", label: "Quiet Luxury", desc: "Elegant, understated, exclusive" },
+    { id: "bold_startup", label: "Bold Disruptor", desc: "Energetic, visionary, direct" },
+    { id: "empathetic_guide", label: "Empathetic Guide", desc: "Warm, supportive, educational" },
+    { id: "technical_expert", label: "Technical Expert", desc: "Analytical, detailed, objective" },
+] as const;
+
+export default function AssetEnginePage() {
     const router = useRouter();
+    const createPost = useMutation(api.posts.create);
+    const settings = useQuery(api.settings.get);
 
-    const handleCreate = async () => {
-        const title = window.prompt("Enter post title:");
-        if (!title) return;
+    const [selectedVoice, setSelectedVoice] = useState<string>("corporate_authority");
+    const [searchQuery, setSearchQuery] = useState("");
 
-        const slug = title
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)+/g, "");
+    const handleCreateContent = async (typeId: string) => {
+        // For now, route everything to the editor, but tag it in the future
+        if (typeId === "blog_post" || typeId === "company_brief" || typeId === "email_campaign") {
+            const title = window.prompt(`Enter title for your new ${typeId.replace("_", " ")}:`);
+            if (!title) return;
 
-        try {
-            await createPost({
-                title,
-                slug,
-                content: ""
-            });
-            router.push(`/admin/content/${slug}`);
-        } catch (error) {
-            alert("Failed to create post. Slug might be taken.");
-            console.error(error);
+            const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+
+            try {
+                await createPost({ title, slug, content: "" }); // Will add voice/type later
+                router.push(`/admin/content/${slug}`);
+            } catch {
+                toast.error("Failed to create. Title might be taken.");
+            }
+        } else {
+            toast.info(`${typeId.replace("_", " ")} generator coming in next phase`);
         }
     };
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "published": return "text-emerald-400 bg-emerald-400/10 border-emerald-400/20";
-            case "draft": return "text-yellow-400 bg-yellow-400/10 border-yellow-400/20";
-            case "scheduled": return "text-blue-400 bg-blue-400/10 border-blue-400/20";
-            default: return "text-white/40 bg-white/5 border-white/10";
-        }
-    };
+    const filteredTypes = CONTENT_TYPES.filter(t => t.label.toLowerCase().includes(searchQuery.toLowerCase()) || t.desc.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const primaryAccent = settings?.primaryColor || "#1A1F36";
+    const accent = settings?.accentColor || "#C9A84C";
 
     return (
-        <div className="space-y-8">
+        <div className="max-w-6xl mx-auto space-y-12 pb-20">
+            {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-serif font-bold text-white tracking-tight">
-                        Content Manager
-                    </h1>
-                    <p className="text-white/40 mt-1 font-light">
-                        Write and publish your thoughts.
+                    <h1 className="text-3xl font-serif font-bold text-white tracking-tight">Asset Engine</h1>
+                    <p className="text-white/40 mt-1 font-light flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-amber-400" />
+                        The content creation hub for your agency
                     </p>
                 </div>
-                <button
-                    onClick={handleCreate}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#3259A8] hover:bg-[#264280] text-white rounded-lg text-sm transition-all shadow-lg shadow-blue-900/20"
-                >
-                    <Plus className="w-4 h-4" />
-                    New Draft
-                </button>
+                <div className="relative w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                    <input
+                        type="text"
+                        placeholder="Search formats..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-white/30 placeholder:text-white/20"
+                    />
+                </div>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-[#0A0C14]/50 backdrop-blur-md overflow-hidden">
-                <table className="w-full text-left text-sm">
-                    <thead className="bg-white/5 text-white/60 font-medium">
-                        <tr>
-                            <th className="px-6 py-4">Title</th>
-                            <th className="px-6 py-4">Slug</th>
-                            <th className="px-6 py-4">Status</th>
-                            <th className="px-6 py-4">Published</th>
-                            <th className="px-6 py-4 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                        {!posts ? (
-                            <tr>
-                                <td colSpan={5} className="px-6 py-8 text-center text-white/40 animate-pulse">
-                                    Loading updates from the uplink...
-                                </td>
-                            </tr>
-                        ) : posts.length === 0 ? (
-                            <tr>
-                                <td colSpan={5} className="px-6 py-12 text-center text-white/40">
-                                    <FileText className="w-8 h-8 mx-auto mb-3 opacity-20" />
-                                    No content found. Start writing.
-                                </td>
-                            </tr>
-                        ) : (
-                            posts.map((post) => (
-                                <tr
-                                    key={post._id}
-                                    className="hover:bg-white/5 transition-colors group"
+            {/* AI Brand Voice Selector */}
+            <div className="p-8 rounded-2xl border border-white/[0.06] relative overflow-hidden group">
+                {/* Paper Texture bg */}
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/rice-paper-2.png")' }} />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none" />
+
+                <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-6">
+                        <Mic className="w-4 h-4 text-white/40" />
+                        <h2 className="text-xs font-medium text-white/50 uppercase tracking-[0.15em]">AI Brand Voice</h2>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                        {BRAND_VOICES.map((voice) => {
+                            const isSelected = selectedVoice === voice.id;
+                            return (
+                                <button
+                                    key={voice.id}
+                                    onClick={() => setSelectedVoice(voice.id)}
+                                    className={`relative px-5 py-3 rounded-xl border text-left transition-all overflow-hidden ${isSelected ? "border-transparent text-black shadow-[0_0_20px_rgba(255,255,255,0.1)] scale-[1.02]" : "border-white/10 bg-white/[0.02] text-white/60 hover:bg-white/[0.06] hover:text-white"}`}
                                 >
-                                    <td className="px-6 py-4 font-medium text-white">
-                                        {post.title}
-                                    </td>
-                                    <td className="px-6 py-4 text-white/40 font-mono text-xs">
-                                        /{post.slug}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(post.status)}`}>
-                                            {post.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-white/60">
-                                        {post.publishedAt
-                                            ? format(new Date(post.publishedAt), "MMM d, yyyy")
-                                            : "—"}
-                                    </td>
-                                    <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
-                                        <Link
-                                            href={`/admin/content/${post.slug}`}
-                                            className="p-1.5 hover:bg-white/10 text-white/40 hover:text-white rounded transition-colors"
-                                            title="Edit"
-                                        >
-                                            <Edit3 className="w-4 h-4" />
-                                        </Link>
-                                        {post.status === "published" && (
-                                            <a
-                                                href={`/thoughts/${post.slug}`}
-                                                target="_blank"
-                                                className="p-1.5 hover:bg-white/10 text-white/40 hover:text-emerald-400 rounded transition-colors"
-                                                title="View Live"
-                                            >
-                                                <Globe className="w-4 h-4" />
-                                            </a>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                                    {isSelected && <div className="absolute inset-0 opacity-90" style={{ backgroundColor: accent }} />}
+                                    <div className="relative z-10">
+                                        <div className="text-sm font-medium">{voice.label}</div>
+                                        <div className={`text-[10px] mt-0.5 ${isSelected ? "text-black/60" : "text-white/30"}`}>{voice.desc}</div>
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+
+            {/* Content Type Grid */}
+            <div>
+                <div className="flex items-center gap-2 mb-6">
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: primaryAccent }} />
+                    <h2 className="text-xs font-medium text-white/50 uppercase tracking-[0.15em]">Content Formats</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {filteredTypes.map((type) => (
+                        <button
+                            key={type.id}
+                            onClick={() => handleCreateContent(type.id)}
+                            className="group relative p-6 rounded-2xl border border-white/[0.06] bg-white/[0.01] hover:bg-white/[0.04] transition-all duration-300 text-left overflow-hidden flex flex-col min-h-[160px]"
+                        >
+                            {/* Paper texture hover effect */}
+                            <div className="absolute inset-0 opacity-0 group-hover:opacity-[0.05] transition-opacity duration-500 pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/rice-paper-2.png")' }} />
+
+                            {/* Color Glow */}
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-[60px] opacity-0 group-hover:opacity-10 transition-opacity duration-500 translate-x-10 -translate-y-10" style={{ backgroundColor: type.color }} />
+
+                            <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.05] flex items-center justify-center mb-auto group-hover:scale-110 transition-transform duration-500 shadow-lg">
+                                <type.icon className="w-5 h-5" style={{ color: type.color }} />
+                            </div>
+
+                            <div className="mt-6 flex flex-col">
+                                <span className="text-white font-medium text-sm group-hover:text-white transition-colors">
+                                    {type.label}
+                                </span>
+                                <span className="text-white/40 text-xs mt-1">
+                                    {type.desc}
+                                </span>
+                            </div>
+
+                            {/* Hover Arrow */}
+                            <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300">
+                                <ChevronRight className="w-4 h-4 text-white/50" />
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Recent Output (Placeholder for next phase) */}
+            <div className="pt-8 border-t border-white/[0.06]">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-white/30" />
+                        <h2 className="text-xs font-medium text-white/50 uppercase tracking-[0.15em]">Recent Output</h2>
+                    </div>
+                </div>
+                <div className="p-12 rounded-2xl border border-dashed border-white/[0.08] flex flex-col items-center justify-center text-center">
+                    <h3 className="text-sm font-medium text-white/60">No recent assets</h3>
+                    <p className="text-xs text-white/30 mt-1">Select a format above to start generating content.</p>
+                </div>
             </div>
         </div>
     );

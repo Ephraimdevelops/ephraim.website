@@ -245,3 +245,71 @@ export const generateUploadUrl = mutation({
         return await ctx.storage.generateUploadUrl();
     },
 });
+
+// ═══════════════════════════════════════════════════════════════
+// PROJECT DASHBOARD (aggregated view for detail page)
+// ═══════════════════════════════════════════════════════════════
+export const getProjectDashboard = query({
+    args: { id: v.id("projects") },
+    handler: async (ctx, args) => {
+        const project = await ctx.db.get(args.id);
+        if (!project) return null;
+
+        // Get client
+        const client = project.clientId ? await ctx.db.get(project.clientId) : null;
+
+        // Get tasks linked to this project
+        const allTasks = await ctx.db.query("tasks").collect();
+        const tasks = allTasks.filter((t) => t.projectId === args.id && !t.deletedAt);
+        const taskStats = {
+            total: tasks.length,
+            todo: tasks.filter((t) => t.status === "todo").length,
+            inProgress: tasks.filter((t) => t.status === "in_progress").length,
+            review: tasks.filter((t) => t.status === "review").length,
+            done: tasks.filter((t) => t.status === "done").length,
+        };
+
+        // Get time entries linked to this project
+        const allTimeEntries = await ctx.db.query("timeEntries").collect();
+        const timeEntries = allTimeEntries.filter((t) => t.projectId === args.id && !t.deletedAt);
+
+        // Enrich time entries with employee names
+        const enrichedTime = await Promise.all(
+            timeEntries.map(async (entry) => {
+                const emp = await ctx.db.get(entry.employeeId);
+                return { ...entry, employeeName: emp?.name || "Unknown" };
+            })
+        );
+
+        const totalHours = timeEntries.reduce((sum, t) => sum + t.hours, 0);
+        const billableHours = timeEntries.filter((t) => t.billable).reduce((sum, t) => sum + t.hours, 0);
+        const revenueCents = timeEntries.filter((t) => t.billable).reduce((sum, t) => sum + (t.billRateAtTimeCents || 0) * t.hours, 0);
+
+        // Get invoices linked to this project
+        const allInvoices = await ctx.db.query("invoices").collect();
+        const invoices = allInvoices.filter((inv) => inv.projectId === args.id && !inv.deletedAt);
+        const invoiceStats = {
+            total: invoices.length,
+            totalAmountCents: invoices.reduce((sum, inv) => sum + Math.round(inv.total * 100), 0),
+            paidCents: invoices.filter((inv) => inv.status === "paid").reduce((sum, inv) => sum + Math.round(inv.total * 100), 0),
+            outstandingCents: invoices.filter((inv) => inv.status !== "paid" && inv.status !== "cancelled").reduce((sum, inv) => sum + Math.round(inv.total * 100), 0),
+        };
+
+        // Cover image URL
+        let coverUrl: string | null = null;
+        if (project.coverImage) {
+            coverUrl = await ctx.storage.getUrl(project.coverImage);
+        }
+
+        return {
+            project: { ...project, coverUrl },
+            client,
+            tasks,
+            taskStats,
+            timeEntries: enrichedTime,
+            timeStats: { totalHours, billableHours, revenueCents },
+            invoices,
+            invoiceStats,
+        };
+    },
+});

@@ -192,10 +192,30 @@ export const markAsPaid = mutation({
         stripePaymentId: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
+        const invoice = await ctx.db.get(args.id);
+        if (!invoice) throw new Error("Invoice not found");
+
+        const paidAt = Date.now();
+
+        // Auto-create income transaction in the ledger
+        await ctx.db.insert("transactions", {
+            type: "income",
+            amountCents: Math.round(invoice.total * 100), // Convert dollars to cents
+            currency: invoice.currency,
+            description: `Invoice ${invoice.invoiceNumber} paid`,
+            category: "invoice",
+            date: paidAt,
+            paymentGateway: args.stripePaymentId ? "stripe" : "manual",
+            createdFrom: "invoice",
+            createdFromId: args.id,
+            isReversal: false,
+            createdAt: paidAt,
+        });
+
         await ctx.db.patch(args.id, {
             status: "paid",
-            paidAt: Date.now(),
-            updatedAt: Date.now(),
+            paidAt,
+            updatedAt: paidAt,
         });
     },
 });
@@ -242,9 +262,13 @@ export const getFinancialStats = query({
             0
         );
         const totalExpenses = filteredExpenses.reduce(
-            (sum, exp) => sum + exp.amount,
+            (sum, exp) => {
+                // Handle both legacy `amount` and new `amountCents`
+                const cents = (exp as any).amountCents ?? Math.round(((exp as any).amount ?? 0) * 100);
+                return sum + cents;
+            },
             0
-        );
+        ) / 100; // Convert back to dollars for display
         const netProfit = totalRevenue - totalExpenses;
         const profitMargin =
             totalRevenue > 0 ? Math.round((netProfit / totalRevenue) * 100) : 0;
@@ -293,7 +317,10 @@ export const getTaxEstimate = query({
 
         const ytdDeductibleExpenses = expenses
             .filter((exp) => exp.date >= startOfYear.getTime() && exp.isTaxDeductible)
-            .reduce((sum, exp) => sum + exp.amount, 0);
+            .reduce((sum, exp) => {
+                const cents = (exp as any).amountCents ?? Math.round(((exp as any).amount ?? 0) * 100);
+                return sum + cents;
+            }, 0) / 100; // Convert to dollars
 
         const taxableIncome = ytdRevenue - ytdDeductibleExpenses;
         const estimatedTax = Math.max(0, Math.round(taxableIncome * taxRate));

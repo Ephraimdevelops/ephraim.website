@@ -2,14 +2,22 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
 // ═══════════════════════════════════════════════════════════════
-// SETTINGS - Business Profile & Configuration
+// BRAND DNA — Business Identity & Configuration
 // ═══════════════════════════════════════════════════════════════
 
 export const get = query({
     args: {},
     handler: async (ctx) => {
         const settings = await ctx.db.query("taxSettings").first();
-        return settings;
+        if (!settings) return null;
+
+        // Resolve logo URL for sidebar, invoices, etc.
+        let logoUrl: string | null = null;
+        if (settings.logo) {
+            logoUrl = await ctx.storage.getUrl(settings.logo);
+        }
+
+        return { ...settings, logoUrl };
     },
 });
 
@@ -21,6 +29,11 @@ export const update = mutation({
         logo: v.optional(v.id("_storage")),
         primaryColor: v.optional(v.string()),
         secondaryColor: v.optional(v.string()),
+        accentColor: v.optional(v.string()),
+        tagline: v.optional(v.string()),
+        phone: v.optional(v.string()),
+        website: v.optional(v.string()),
+        socialLinks: v.optional(v.string()),
         invoiceFooterText: v.optional(v.string()),
         defaultTaxRate: v.optional(v.number()),
         currency: v.optional(v.string()),
@@ -36,7 +49,6 @@ export const update = mutation({
         if (existing) {
             await ctx.db.patch(existing._id, data);
         } else {
-            // Get current user for userId reference (required by schema)
             const identity = await ctx.auth.getUserIdentity();
             if (!identity) throw new Error("Unauthenticated");
 

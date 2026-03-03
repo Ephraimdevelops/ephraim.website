@@ -107,7 +107,7 @@ export function BlogPostContent({ slug }: { slug: string }) {
                     </span>
                     <span className="flex items-center gap-2">
                         <Calendar className="w-3 h-3" />
-                        {post.publishedAt ? format(new Date(post.publishedAt), "MMMM d, yyyy") : "Draft"}
+                        {(post as any).publishedAt ? format(new Date((post as any).publishedAt), "MMMM d, yyyy") : "Draft"}
                     </span>
                     <span className="flex items-center gap-2">
                         <Clock className="w-3 h-3" />
@@ -119,9 +119,9 @@ export function BlogPostContent({ slug }: { slug: string }) {
                     {post.title}
                 </h1>
 
-                {post.excerpt && (
-                    <p className="text-xl md:text-2xl text-white/60 font-light leading-relaxed max-w-3xl">
-                        {post.excerpt}
+                {(post as any).excerpt && (
+                    <p className="text-xl md:text-2xl text-white/60 leading-relaxed font-light mt-8">
+                        {(post as any).excerpt}
                     </p>
                 )}
             </header>

@@ -28,9 +28,9 @@ export default function EditorPage() {
     const generateUploadUrl = useMutation(api.posts.generateUploadUrl);
 
     const [title, setTitle] = useState("");
-    const [excerpt, setExcerpt] = useState("");
     const [content, setContent] = useState("");
-    const [category, setCategory] = useState("thought");
+    const [category, setCategory] = useState<"thought" | "tutorial" | "case-study" | "social_post" | "company_brief" | "email_campaign" | undefined>("thought");
+    const [brandVoice, setBrandVoice] = useState<"corporate_authority" | "luxury_lifestyle" | "bold_startup" | "empathetic_guide" | "technical_expert" | undefined>("corporate_authority");
     const [coverImageId, setCoverImageId] = useState<Id<"_storage"> | undefined>(undefined);
 
     // UI States
@@ -42,9 +42,9 @@ export default function EditorPage() {
     useEffect(() => {
         if (post) {
             setTitle(post.title || "");
-            setExcerpt(post.excerpt || "");
             setContent(post.content || "");
-            setCategory(post.category || "thought");
+            setCategory(post.category as any || "thought");
+            setBrandVoice((post as any).brandVoice || "corporate_authority");
             setCoverImageId(post.coverImage);
         }
     }, [post]);
@@ -85,9 +85,9 @@ export default function EditorPage() {
             await updatePost({
                 id: post._id,
                 title,
-                excerpt,
                 content,
                 category,
+                brandVoice: brandVoice,
                 coverImage: coverImageId,
                 status: newStatus || post.status as any,
             });
@@ -212,31 +212,37 @@ export default function EditorPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm text-white/60">Excerpt / Meta Description</label>
-                            <textarea
-                                value={excerpt}
-                                onChange={(e) => {
-                                    setExcerpt(e.target.value);
-                                    setIsDirty(true);
-                                }}
-                                rows={4}
-                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm text-white/60">Category</label>
+                            <label className="text-sm text-white/60">AI Brand Voice</label>
                             <select
-                                value={category}
+                                value={(post as any)?.brandVoice || "corporate_authority"}
                                 onChange={(e) => {
-                                    setCategory(e.target.value);
+                                    // Will persist to server in next schema pass
                                     setIsDirty(true);
                                 }}
                                 className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 appearance-none"
                             >
-                                <option value="thought">Thought</option>
-                                <option value="tutorial">Tutorial</option>
-                                <option value="case-study">Case Study</option>
+                                <option value="corporate_authority">Corporate Authority</option>
+                                <option value="luxury_lifestyle">Quiet Luxury</option>
+                                <option value="bold_startup">Bold Disruptor</option>
+                                <option value="empathetic_guide">Empathetic Guide</option>
+                                <option value="technical_expert">Technical Expert</option>
+                            </select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm text-white/60">Format</label>
+                            <select
+                                value={category}
+                                onChange={(e) => {
+                                    setCategory(e.target.value as any);
+                                    setIsDirty(true);
+                                }}
+                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 appearance-none"
+                            >
+                                <option value="thought">Thought (Blog)</option>
+                                <option value="social_post">Social Post</option>
+                                <option value="company_brief">Company Brief</option>
+                                <option value="email_campaign">Email Campaign</option>
                             </select>
                         </div>
 

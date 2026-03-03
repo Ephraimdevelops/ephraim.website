@@ -40,7 +40,7 @@ const clientSchema = z.object({
     company: z.string().optional(),
     email: z.string().email("Invalid email address"),
     phone: z.string().optional(),
-    status: z.enum(["lead", "negotiating", "active", "retainer", "archived"]).default("lead"),
+    status: z.enum(["lead", "negotiating", "active", "retainer", "archived"]),
     notes: z.string().optional(),
 });
 

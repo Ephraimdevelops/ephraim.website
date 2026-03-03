@@ -47,8 +47,8 @@ export default function ThoughtsPage() {
                     <button
                         onClick={() => setSelectedCategory(null)}
                         className={`px-4 py-2 rounded-full text-sm transition-all ${selectedCategory === null
-                                ? "bg-white text-black font-medium"
-                                : "text-white/60 hover:text-white hover:bg-white/5"
+                            ? "bg-white text-black font-medium"
+                            : "text-white/60 hover:text-white hover:bg-white/5"
                             }`}
                     >
                         All
@@ -58,8 +58,8 @@ export default function ThoughtsPage() {
                             key={cat}
                             onClick={() => setSelectedCategory(cat)}
                             className={`px-4 py-2 rounded-full text-sm capitalize transition-all ${selectedCategory === cat
-                                    ? "bg-white text-black font-medium"
-                                    : "text-white/60 hover:text-white hover:bg-white/5"
+                                ? "bg-white text-black font-medium"
+                                : "text-white/60 hover:text-white hover:bg-white/5"
                                 }`}
                         >
                             {cat.replace("-", " ")}
@@ -117,7 +117,7 @@ export default function ThoughtsPage() {
                                     </h2>
 
                                     <p className="text-white/60 text-sm line-clamp-3 mb-6 flex-1 leading-relaxed">
-                                        {post.excerpt || "No summary available."}
+                                        {(post as any).excerpt || "No summary available."}
                                     </p>
 
                                     <div className="flex items-center text-blue-400 text-sm font-medium group-hover:translate-x-1 transition-transform">

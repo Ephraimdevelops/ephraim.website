@@ -90,7 +90,7 @@ export function InsightsSection() {
                                             {post.title}
                                         </h3>
                                         <p className="text-[#8A9AB4] text-sm leading-relaxed mb-6 line-clamp-3">
-                                            {post.excerpt || "Read more about this topic..."}
+                                            {(post as any).excerpt || "Read more about this topic..."}
                                         </p>
 
                                         <div className="mt-auto flex items-center gap-2 text-sm text-[#3259A8] font-technical group-hover:gap-4 transition-all">
